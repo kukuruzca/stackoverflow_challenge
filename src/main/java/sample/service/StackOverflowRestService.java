@@ -28,11 +28,14 @@ public final class StackOverflowRestService {
 
         boolean hasMore = true;
         int page = 1;
+
+        //there is no sense to request users in multi threads, because StackExchange blocks ip address if there are to many requests from single ip address
+        //this is why i use page size as mach as possible;
         while(hasMore)
         {
             // Create a call instance for getting users.
             Call<CommonWrapperObject<StackOverflowUser>> call = stackOverflow.usersPaged("reputation", 230,1000,"desc"
-                    , "stackoverflow",1000, page);
+                    , "stackoverflow",10000, page);
 
             Response<CommonWrapperObject<StackOverflowUser>> execution = call.execute();
 
