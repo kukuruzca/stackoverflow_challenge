@@ -35,7 +35,7 @@ public final class StackOverflowRestService {
         {
             // Create a call instance for getting users.
             Call<CommonWrapperObject<StackOverflowUser>> call = stackOverflow.usersPaged("reputation", 230,1000,"desc"
-                    , "stackoverflow",10000, page);
+                    , "stackoverflow",100, page);
 
             Response<CommonWrapperObject<StackOverflowUser>> execution = call.execute();
 
@@ -51,7 +51,7 @@ public final class StackOverflowRestService {
             CommonWrapperObject<StackOverflowUser> commonWrapperObject = execution.body();
 
             commonWrapperObject.items.stream().parallel()
-                    .filter(x-> x!= null && x.location!= null && x.location.contains("Moldova"))
+                    .filter(x-> x!= null && x.location!= null && (x.location.contains("Moldova") || x.location.contains("Romania")))
                     .forEach(x->
                     {
                         if (x.display_name != null)
