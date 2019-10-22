@@ -7,6 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 import sample.service.responses.CommonWrapperObject;
+import sample.service.responses.Filter;
 import sample.service.responses.StackOverflowUser;
 
 import java.awt.*;
@@ -23,14 +24,16 @@ public final class StackOverflowRestService {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        // Create an instance of stackOverflow
+        // Create an instance of stackOverflow REST api
         StackOverflowRestApi stackOverflow = retrofit.create(StackOverflowRestApi.class);
 
         boolean hasMore = true;
         int page = 1;
 
+        CommonWrapperObject<Filter> filter = stackOverflow.getFilters("!*MGgl*rBPKwOdwWm").execute().body();
         //there is no sense to request users in multi threads, because StackExchange blocks ip address if there are to many requests from single ip address
-        //this is why i use page size as mach as possible;
+        //this is why i use page size as mach as possible (max 100);
+        //maximum quota per day - 300 requests
         while(hasMore)
         {
             // Create a call instance for getting users.
@@ -41,10 +44,8 @@ public final class StackOverflowRestService {
 
             if (!execution.isSuccessful())
             {
-
                 System.out.println("Bad Request");
                 System.out.println(execution.errorBody().string());
-
                 break;
             }
 
