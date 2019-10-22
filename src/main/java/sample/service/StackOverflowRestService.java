@@ -1,6 +1,7 @@
 package sample.service;
 
 import retrofit2.Call;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
@@ -30,11 +31,22 @@ public final class StackOverflowRestService {
         while(hasMore)
         {
             // Create a call instance for getting users.
-            Call<CommonWrapperObject<StackOverflowUser>> callList = stackOverflow.usersPaged("reputation", 230,1000,"desc", "stackoverflow"
-            ,100,page);
+            Call<CommonWrapperObject<StackOverflowUser>> call = stackOverflow.usersPaged("reputation", 230,1000,"desc"
+                    , "stackoverflow",1000, page);
 
-            CommonWrapperObject<StackOverflowUser> commonWrapperObject = callList.execute().body();
-            
+            Response<CommonWrapperObject<StackOverflowUser>> execution = call.execute();
+
+            if (!execution.isSuccessful())
+            {
+
+                System.out.println("Bad Request");
+                System.out.println(execution.errorBody().string());
+
+                break;
+            }
+
+            CommonWrapperObject<StackOverflowUser> commonWrapperObject = execution.body();
+
             commonWrapperObject.items.stream().parallel()
                     .filter(x-> x!= null && x.location!= null && x.location.contains("Moldova"))
                     .forEach(x->
