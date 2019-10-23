@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 public final class StackOverflowRestService {
     public static final String API_URL = "https://api.stackexchange.com";
+    public static final String SITE = "stackoverflow";
 
     public static <T> void handleResponse(Response<T> response) throws IOException {
         if (!response.isSuccessful())
@@ -51,8 +52,34 @@ public final class StackOverflowRestService {
     }
 
     public static List<String> getUserTags(int userId, StackOverflowRestApi api) throws IOException {
-        CommonWrapperObject<Tag> response = executeCallAndGetResponse(api.getUserTags(userId));
+        CommonWrapperObject<Tag> response = executeCallAndGetResponse(api.getUserTags(userId, SITE));
         return  response.items.stream().filter(x-> StringUtils.isNoneBlank(x.name)).map(x->x.name).collect(Collectors.toList());
+    }
+
+    public static void printUser(User soUser, List<String> usertags)
+    {
+        String userName = soUser.display_name != null ? soUser.display_name : "No name";
+        String userLocation = soUser.location != null ? soUser.location : "No location";
+        String linkToAvatar = soUser.profile_image != null ? soUser.profile_image : "No avatar";
+        String linkToProfile = soUser.link != null ? soUser.link : "No link to profile";
+
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("User: ");
+        stringBuffer.append(userName);
+        stringBuffer.append(" | Location: ");
+        stringBuffer.append(userLocation);
+        stringBuffer.append(" | Answer count: ");
+        stringBuffer.append(soUser.answer_count);
+        stringBuffer.append(" | Question count: ");
+        stringBuffer.append(soUser.question_count);
+        stringBuffer.append(" | Tags: ");
+        stringBuffer.append(String.join(", ", usertags));
+        stringBuffer.append(" | Link to profile: ");
+        stringBuffer.append(linkToProfile);
+        stringBuffer.append(" | Link to avatar: ");
+        stringBuffer.append(linkToAvatar);
+        stringBuffer.append("\n");
+        System.out.println(stringBuffer.toString());
     }
 
     public static void main(String... args) throws IOException {
@@ -76,18 +103,21 @@ public final class StackOverflowRestService {
         while(hasMore)
         {
             // Create a call instance for getting users.
-            Call<CommonWrapperObject<User>> call = stackOverflowApi.usersPagedWithFilter("reputation", 230,1000,"desc"
-                    , "stackoverflow",100, page, customFilter.filter);
+            Call<CommonWrapperObject<User>> call = stackOverflowApi.usersPagedWithFilter("reputation", 223,1000,"asc"
+                    , SITE,100, page, customFilter.filter);
 
             CommonWrapperObject<User> commonWrapperObject = executeCallAndGetResponse(call);
-            commonWrapperObject.items.stream().parallel()
+            commonWrapperObject.items.stream()
+                    .filter(x -> x.answer_count>0)
                     .filter(x-> x!= null && x.location!= null && (x.location.contains("Moldova") || x.location.contains("Romania")))
                     .forEach(x->
                     {
                         try {
                             List<String> usertags = getUserTags(x.user_id, stackOverflowApi);
-                            if (x.display_name != null)
-                                System.out.println(String.format("user %s, location %s", x.display_name,x.location));
+                            printUser(x, usertags);
+
+//                            if (x.display_name != null)
+//                                System.out.println(String.format("user %s, location %s", x.display_name,x.location));
 
                         } catch (IOException e) {
                             e.printStackTrace();
