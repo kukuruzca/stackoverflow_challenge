@@ -56,7 +56,10 @@ public interface StackOverflowRestApi {
 
     @GET("2.2/users/{ids}/tags")
     Call<CommonWrapperObject<Tag>> getUserTags(
-            @Path("ids") int ids,
-            @Query("site") String site);
+            @Path("ids") Integer ids,
+            @Query("site") String site,
+            @Query("page") Integer page,
+            @Query("pagesize") Integer pagesize
+    );
 }
 
