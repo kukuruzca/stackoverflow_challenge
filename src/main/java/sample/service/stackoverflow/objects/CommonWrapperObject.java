@@ -1,4 +1,4 @@
-package sample.service.responses;
+package sample.service.stackoverflow.objects;
 
 import java.util.List;
 

@@ -4,13 +4,10 @@ import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.GET;
-import retrofit2.http.Query;
-import sample.service.responses.CommonWrapperObject;
-import sample.service.responses.Filter;
-import sample.service.responses.StackOverflowUser;
+import sample.service.stackoverflow.objects.CommonWrapperObject;
+import sample.service.stackoverflow.objects.Filter;
+import sample.service.stackoverflow.objects.User;
 
-import java.awt.*;
 import java.io.IOException;
 
 
@@ -37,10 +34,10 @@ public final class StackOverflowRestService {
         while(hasMore)
         {
             // Create a call instance for getting users.
-            Call<CommonWrapperObject<StackOverflowUser>> call = stackOverflow.usersPaged("reputation", 230,1000,"desc"
+            Call<CommonWrapperObject<User>> call = stackOverflow.usersPaged("reputation", 230,1000,"desc"
                     , "stackoverflow",100, page);
 
-            Response<CommonWrapperObject<StackOverflowUser>> execution = call.execute();
+            Response<CommonWrapperObject<User>> execution = call.execute();
 
             if (!execution.isSuccessful())
             {
@@ -49,7 +46,7 @@ public final class StackOverflowRestService {
                 break;
             }
 
-            CommonWrapperObject<StackOverflowUser> commonWrapperObject = execution.body();
+            CommonWrapperObject<User> commonWrapperObject = execution.body();
 
             commonWrapperObject.items.stream().parallel()
                     .filter(x-> x!= null && x.location!= null && (x.location.contains("Moldova") || x.location.contains("Romania")))

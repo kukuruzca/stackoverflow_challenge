@@ -1,6 +1,6 @@
-package sample.service.responses;
+package sample.service.stackoverflow.objects;
 
-public class StackOverflowUser {
+public class User {
     public final String display_name;
     public final int age;
     public final String location;
@@ -9,7 +9,7 @@ public class StackOverflowUser {
     public final String link;
     public final String profile_image;
 
-    public StackOverflowUser(String display_name, int age, String location, int reputation, int user_id, String link, String profile_image) {
+    public User(String display_name, int age, String location, int reputation, int user_id, String link, String profile_image) {
         this.display_name = display_name;
         this.age = age;
         this.location = location;

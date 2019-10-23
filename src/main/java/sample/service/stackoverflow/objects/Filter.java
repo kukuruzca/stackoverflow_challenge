@@ -1,4 +1,4 @@
-package sample.service.responses;
+package sample.service.stackoverflow.objects;
 
 public class Filter {
     public final String filter;
