@@ -1,7 +1,7 @@
 package sample.service.stackoverflow.objects;
 
-public enum  FilterType {
+public enum FilterType {
     safe,
     unsafe,
-    invalid;
+    invalid
 }

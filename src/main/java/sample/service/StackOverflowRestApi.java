@@ -6,8 +6,8 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 import sample.service.stackoverflow.objects.CommonWrapperObject;
 import sample.service.stackoverflow.objects.Filter;
-import sample.service.stackoverflow.objects.User;
 import sample.service.stackoverflow.objects.Tag;
+import sample.service.stackoverflow.objects.User;
 
 import java.util.List;
 
@@ -27,15 +27,7 @@ public interface StackOverflowRestApi {
     );
 
     @GET("2.2/users/{ids}")
-    Call<CommonWrapperObject<User>> usersById(
-            @Path("ids")
-            @Query("sort") String sort,
-            @Query("order") String order,
-            @Query("site") String site
-    );
-
-    @GET("2.2/users/{ids}/tags")
-    Call<CommonWrapperObject<User>> usersTags(
+    Call<CommonWrapperObject<User>> getUsersById(
             @Path("ids")
             @Query("sort") String sort,
             @Query("order") String order,
@@ -47,7 +39,9 @@ public interface StackOverflowRestApi {
             @Query("include") List<String> include,
             @Query("exclude") List<String> exclude,
             @Query("base") String base,
-            @Query("unsafe") boolean unsafe
+            @Query("unsafe") boolean unsafe,
+            @Query("key") String key
+
     );
 
     @GET("2.2/filters/{filters}")
@@ -59,7 +53,8 @@ public interface StackOverflowRestApi {
             @Path("ids") Integer ids,
             @Query("site") String site,
             @Query("page") Integer page,
-            @Query("pagesize") Integer pagesize
+            @Query("pagesize") Integer pagesize,
+            @Query("key") String key
     );
 }
 

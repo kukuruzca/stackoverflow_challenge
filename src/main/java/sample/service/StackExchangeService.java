@@ -11,7 +11,6 @@ import sample.service.stackoverflow.objects.Tag;
 import sample.service.stackoverflow.objects.User;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -23,10 +22,8 @@ public class StackExchangeService {
 
     private final StackOverflowRestApi stackOverflowApi;
     private final String appKey;
-    private Filter customFilter;
 
-
-    public StackExchangeService(String appKey) throws IOException {
+    public StackExchangeService(String appKey) {
         this.appKey = appKey;
         // Create REST adapter
         Retrofit retrofit = new Retrofit.Builder()
@@ -38,14 +35,20 @@ public class StackExchangeService {
         stackOverflowApi = retrofit.create(StackOverflowRestApi.class);
     }
 
+    public CommonWrapperObject<User> getUsers(int page, int reputationMinimum, String filterName) throws IOException {
+        // Create a call instance for getting users.
+        Call<CommonWrapperObject<User>> call = stackOverflowApi.getUsers(null, reputationMinimum, null, null
+                , SITE, 100, page, filterName, appKey);
+
+        return executeCallAndGetResponse(call);
+    }
+
     public List<String> getAllUserTags(int userId) throws IOException {
-        //TODO: add key
         List<String> userTags = new LinkedList<>();
         int page = 1;
         boolean hasMore = true;
-        while (hasMore)
-        {
-            CommonWrapperObject<Tag> response = executeCallAndGetResponse(stackOverflowApi.getUserTags(userId, SITE, page, 100));
+        while (hasMore) {
+            CommonWrapperObject<Tag> response = executeCallAndGetResponse(stackOverflowApi.getUserTags(userId, SITE, page, 100, appKey));
             userTags.addAll(response.items.stream().filter(x -> StringUtils.isNoneBlank(x.name)).map(x -> x.name).collect(Collectors.toList()));
             hasMore = response.has_more;
             page++;
@@ -53,16 +56,8 @@ public class StackExchangeService {
         return userTags;
     }
 
-    public CommonWrapperObject<User> getUsers(int page, int reputationMinimum, Filter filter) throws IOException {
-        // Create a call instance for getting users.
-        Call<CommonWrapperObject<User>> call = stackOverflowApi.getUsers("reputation", reputationMinimum, null, "asc"
-                , SITE, 100, page, filter.filter, appKey);
-
-        return  executeCallAndGetResponse(call);
-    }
-
-    public Filter createFilter(List<String> include , List<String> exclude, String base, boolean unsafe) throws IOException {
-        CommonWrapperObject<Filter> response = executeCallAndGetResponse(stackOverflowApi.createFilter(include, exclude, base, unsafe));
+    public Filter createFilter(List<String> include, List<String> exclude, String base, boolean unsafe) throws IOException {
+        CommonWrapperObject<Filter> response = executeCallAndGetResponse(stackOverflowApi.createFilter(include, exclude, base, unsafe, appKey));
         Optional<Filter> filterFound = response.items.stream().findAny();
         if (filterFound.isPresent())
             return filterFound.get();
@@ -84,7 +79,6 @@ public class StackExchangeService {
         handleResponse(execution);
         return execution.body();
     }
-
 
 
 }
