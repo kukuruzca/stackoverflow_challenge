@@ -31,7 +31,8 @@ public interface StackOverflowRestApi {
             @Path("ids")
             @Query("sort") String sort,
             @Query("order") String order,
-            @Query("site") String site
+            @Query("site") String site,
+            @Query("key") String key
     );
 
     @GET("2.2/filters/create")
@@ -46,7 +47,9 @@ public interface StackOverflowRestApi {
 
     @GET("2.2/filters/{filters}")
     Call<CommonWrapperObject<Filter>> getFilters(
-            @Path("filters") String filters);
+            @Path("filters") String filters,
+            @Query("key") String key
+    );
 
     @GET("2.2/users/{ids}/tags")
     Call<CommonWrapperObject<Tag>> getUserTags(
