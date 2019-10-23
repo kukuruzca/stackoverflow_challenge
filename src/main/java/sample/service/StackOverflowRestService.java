@@ -1,17 +1,21 @@
 package sample.service;
 
+
+import org.apache.commons.lang3.StringUtils;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import sample.service.stackoverflow.objects.CommonWrapperObject;
 import sample.service.stackoverflow.objects.Filter;
+import sample.service.stackoverflow.objects.Tag;
 import sample.service.stackoverflow.objects.User;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 public final class StackOverflowRestService {
@@ -26,18 +30,29 @@ public final class StackOverflowRestService {
         }
     }
 
+    public static <T> T executeCallAndGetResponse(Call<T> call) throws IOException {
+        Response<T> execution = call.execute();
+        handleResponse(execution);
+        return execution.body();
+    }
+
+
     public static Filter createFilter(StackOverflowRestApi api) throws IOException {
 
         List<String> include = Arrays.asList("user.answer_count", "user.question_count");
         List<String> exclude = Arrays.asList();
-        Response<CommonWrapperObject<Filter>> execution = api.createFilter(include, exclude, "default", false).execute();
 
-        handleResponse(execution);
-        Optional<Filter> filterFound = execution.body().items.stream().findAny();
+        CommonWrapperObject<Filter> response = executeCallAndGetResponse(api.createFilter(include, exclude, "default", false));
+        Optional<Filter> filterFound = response.items.stream().findAny();
         if (filterFound.isPresent())
             return filterFound.get();
         else
             throw new RuntimeException("Unable to create filter");
+    }
+
+    public static List<String> getUserTags(int userId, StackOverflowRestApi api) throws IOException {
+        CommonWrapperObject<Tag> response = executeCallAndGetResponse(api.getUserTags(userId));
+        return  response.items.stream().filter(x-> StringUtils.isNoneBlank(x.name)).map(x->x.name).collect(Collectors.toList());
     }
 
     public static void main(String... args) throws IOException {
@@ -64,16 +79,20 @@ public final class StackOverflowRestService {
             Call<CommonWrapperObject<User>> call = stackOverflowApi.usersPagedWithFilter("reputation", 230,1000,"desc"
                     , "stackoverflow",100, page, customFilter.filter);
 
-            Response<CommonWrapperObject<User>> execution = call.execute();
-            handleResponse(execution);
-            CommonWrapperObject<User> commonWrapperObject = execution.body();
-
+            CommonWrapperObject<User> commonWrapperObject = executeCallAndGetResponse(call);
             commonWrapperObject.items.stream().parallel()
                     .filter(x-> x!= null && x.location!= null && (x.location.contains("Moldova") || x.location.contains("Romania")))
                     .forEach(x->
                     {
-                        if (x.display_name != null)
-                            System.out.println(String.format("user %s, location %s", x.display_name,x.location));
+                        try {
+                            List<String> usertags = getUserTags(x.user_id, stackOverflowApi);
+                            if (x.display_name != null)
+                                System.out.println(String.format("user %s, location %s", x.display_name,x.location));
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
                     }
             );
             hasMore = commonWrapperObject.has_more;
