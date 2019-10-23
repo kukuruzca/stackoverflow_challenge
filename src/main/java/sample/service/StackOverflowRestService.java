@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
@@ -114,11 +115,14 @@ public final class StackOverflowRestService {
                     {
                         try {
                             List<String> usertags = getUserTags(x.user_id, stackOverflowApi);
-                            printUser(x, usertags);
+                            Predicate<String> p1 = e -> e.toLowerCase().equals("java");
+                            Predicate<String> p2 = e -> e.toLowerCase().equals("c#");
+                            Predicate<String> p3 = e -> e.toLowerCase().equals(".net");
+                            Predicate<String> p4 = e -> e.toLowerCase().equals("docker");
+                            boolean foundtag= usertags.stream().anyMatch(p1.or(p2).or(p3).or(p4));
 
-//                            if (x.display_name != null)
-//                                System.out.println(String.format("user %s, location %s", x.display_name,x.location));
-
+                            if(foundtag)
+                                printUser(x, usertags);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
