@@ -12,34 +12,18 @@ import sample.service.stackoverflow.objects.Tag;
 import java.util.List;
 
 public interface StackOverflowRestApi {
-    @GET("2.2/users")
-    Call<CommonWrapperObject<User>> users(
-            @Query("sort") String sort,
-            @Query("order") String order,
-            @Query("site") String site
-    );
 
     @GET("2.2/users")
-    Call<CommonWrapperObject<User>> usersPaged(
+    Call<CommonWrapperObject<User>> getUsers(
             @Query("sort") String sort,
-            @Query("min") int min,
-            @Query("max") int max,
+            @Query("min") Integer min,
+            @Query("max") Integer max,
             @Query("order") String order,
             @Query("site") String site,
-            @Query("pagesize") int pagesize,
-            @Query("page") int page
-    );
-
-    @GET("2.2/users")
-    Call<CommonWrapperObject<User>> usersPagedWithFilter(
-            @Query("sort") String sort,
-            @Query("min") int min,
-            @Query("max") int max,
-            @Query("order") String order,
-            @Query("site") String site,
-            @Query("pagesize") int pagesize,
-            @Query("page") int page,
-            @Query("filter") String filter
+            @Query("pagesize") Integer pagesize,
+            @Query("page") Integer page,
+            @Query("filter") String filter,
+            @Query("key") String key
     );
 
     @GET("2.2/users/{ids}")

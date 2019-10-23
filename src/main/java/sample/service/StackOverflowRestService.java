@@ -83,12 +83,14 @@ public final class StackOverflowRestService {
         System.out.println(stringBuffer.toString());
     }
 
-    public static void main(String... args) throws IOException {
+    public static void main(String... args) throws IOException, InterruptedException {
+
         // Create REST adapter
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+
 
         // Create an instance of stackOverflow REST api
         StackOverflowRestApi stackOverflowApi = retrofit.create(StackOverflowRestApi.class);
@@ -104,8 +106,8 @@ public final class StackOverflowRestService {
         while(hasMore)
         {
             // Create a call instance for getting users.
-            Call<CommonWrapperObject<User>> call = stackOverflowApi.usersPagedWithFilter("reputation", 223,1000,"asc"
-                    , SITE,100, page, customFilter.filter);
+            Call<CommonWrapperObject<User>> call = stackOverflowApi.getUsers("reputation", 223,null,"asc"
+                    , SITE,100, page, customFilter.filter, "TnWGwQfIf9SAk3Gkz2H5Lw((");
 
             CommonWrapperObject<User> commonWrapperObject = executeCallAndGetResponse(call);
             commonWrapperObject.items.stream()
@@ -131,6 +133,7 @@ public final class StackOverflowRestService {
             );
             hasMore = commonWrapperObject.has_more;
             page++;
+            Thread.sleep(1000);
         }
 
     }
