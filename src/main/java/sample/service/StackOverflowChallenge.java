@@ -72,7 +72,22 @@ public final class StackOverflowChallenge {
         //create new filter on base of default
         //add new fields in filter
         List<String> include = Arrays.asList("user.answer_count", "user.question_count");
-        List<String> exclude = Arrays.asList();
+        List<String> exclude = Arrays.asList("accept_rate"
+                ,"age"
+                ,"badge_counts"
+                ,"badge_counts"
+                ,"creation_date"
+                ,"is_employee"
+                ,"last_access_date"
+                ,"last_modified_date"
+                ,"reputation_change_day"
+                ,"reputation_change_month"
+                ,"reputation_change_quarter"
+                ,"reputation_change_week"
+                ,"reputation_change_year"
+                ,"timed_penalty_date"
+                ,"user_type"
+                ,"website_url");
         Filter filter = stackExchange.createFilter(include, exclude, "default", false);
 
         //start from page 1
